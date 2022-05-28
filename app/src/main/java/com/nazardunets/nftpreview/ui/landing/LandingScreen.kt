@@ -21,12 +21,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nazardunets.nftpreview.ui.theme.NFTPreviewTheme
 
 @Composable
-fun LandingScreen() {
-    Column(Modifier.fillMaxSize()) {
+fun LandingScreen(
+    modifier: Modifier = Modifier
+) {
+    Column(modifier.fillMaxSize()) {
         Box(
             Modifier
                 .fillMaxWidth()
@@ -80,7 +84,7 @@ private fun ActionButton(
         modifier = modifier
             .height(ActionButtonHeight)
             .clip(ActionButtonShape)
-            .background(ActionButtonColor)
+            .background(MaterialTheme.colors.primary)
             .clickable(onClick = onClick)
             .padding(horizontal = 48.dp)
             .wrapContentHeight(),
@@ -119,6 +123,14 @@ private fun VerticalFadeGradient(
     )
 }
 
+@Preview
+@Composable
+private fun LandingScreenPreview() {
+    NFTPreviewTheme {
+        LandingScreen()
+    }
+}
+
 private enum class FadeDirection {
     UP, DOWN
 }
@@ -130,5 +142,4 @@ private val FadeGradientHeight = 150.dp
 
 private val ActionButtonHeight = 54.dp
 private val ActionButtonShape = RoundedCornerShape(8.dp)
-private val ActionButtonColor = Color(0xFF1821D3)
 private val ActionButtonTextStyle = TextStyle(fontSize = 16.sp, fontWeight = FontWeight.Bold)

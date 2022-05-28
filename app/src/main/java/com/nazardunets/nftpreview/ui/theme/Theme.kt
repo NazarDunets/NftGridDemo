@@ -8,7 +8,8 @@ import androidx.compose.ui.graphics.Color
 @Composable
 fun NFTPreviewTheme(content: @Composable () -> Unit) {
     val colors = darkColors(
-        background = Color.Black
+        background = Color.Black,
+        primary = Blue400
     )
 
     MaterialTheme(
