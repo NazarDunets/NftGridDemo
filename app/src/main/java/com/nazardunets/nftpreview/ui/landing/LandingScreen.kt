@@ -70,7 +70,7 @@ fun LandingScreen(
             modifier = horizontalPaddingModifier,
             text = "Discover"
         )
-        Spacer(modifier = Modifier.height(64.dp))
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
