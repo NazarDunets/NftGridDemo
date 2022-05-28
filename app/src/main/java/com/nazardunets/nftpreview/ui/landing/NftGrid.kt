@@ -30,25 +30,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.math.tan
 
 @Composable
 fun NftGrid(
     modifier: Modifier = Modifier,
-    allowOverflow: Boolean = true
+    allowHorizontalOverflow: Boolean = false
 ) {
     val context = LocalContext.current
     val gridData = remember { getGridData(context) }
 
     NftGridContainer(
         modifier = modifier,
-        allowOverflow = allowOverflow
+        allowHorizontalOverflow = allowHorizontalOverflow
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .rotate(-5f)
+                .rotate(ROTATION_DEGREES)
         ) {
             gridData.forEachIndexed { index, items ->
                 NftRow(itemsRes = items, speedFactor = SpeedFactors[index])
@@ -60,19 +63,29 @@ fun NftGrid(
 @Composable
 private fun NftGridContainer(
     modifier: Modifier,
-    allowOverflow: Boolean,
+    allowHorizontalOverflow: Boolean,
     content: @Composable () -> Unit
 ) {
     Layout(
         modifier = modifier.fillMaxWidth(),
         content = content
     ) { msrbls, cnstr ->
-        val actualMaxWidth = if (allowOverflow) cnstr.maxWidth + WIDTH_OVERFLOW else cnstr.maxWidth
+        val actualMaxWidth = if (allowHorizontalOverflow) cnstr.maxWidth + WIDTH_OVERFLOW else cnstr.maxWidth
 
-        val placeable = msrbls[0].measure(Constraints(maxWidth = actualMaxWidth, maxHeight = cnstr.maxHeight))
+        val placeable = msrbls[0].measure(
+            Constraints(
+                maxWidth = actualMaxWidth,
+                maxHeight = cnstr.maxHeight
+            )
+        )
 
-        layout(width = actualMaxWidth, height = placeable.height) {
-            placeable.placeRelative(0, 0)
+        // account for height increase due to grid rotation
+        // without this you cant build UI's comfortably, since grid's measured height and visual one will be different
+        val rotationHeightIncrease = abs(cnstr.maxWidth * tan(ROTATION_RADIANS)) + 4 // few extra pixels for safety
+        val layoutHeight = placeable.height + rotationHeightIncrease
+
+        layout(width = actualMaxWidth, height = layoutHeight.roundToInt()) {
+            placeable.placeRelative(0, (rotationHeightIncrease * 0.5f).roundToInt())
         }
     }
 }
@@ -82,7 +95,10 @@ private fun NftRow(
     itemsRes: List<Int>,
     speedFactor: Float
 ) {
-    BoxWithConstraints(Modifier.fillMaxWidth()) {
+    BoxWithConstraints(
+        Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()) {
         val scrollProgress by rememberInfiniteTransition().animateFloat(
             initialValue = 0f,
             targetValue = 1f,
@@ -130,6 +146,8 @@ private const val ROWS_COUNT = 4
 private const val ITEMS_PER_ROW = 12
 private const val BASE_ANIM_DURATION = 12_000
 private const val WIDTH_OVERFLOW = 100
+private const val ROTATION_DEGREES = -5f
+private const val ROTATION_RADIANS = ROTATION_DEGREES * PI / 180
 
 private val ImageSize = 130.dp
 private val SpeedFactors = floatArrayOf(1f, .7f, .9f, 1.1f)
